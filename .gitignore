@@ -19,6 +19,17 @@ fp-info-cache
 ~*.lck
 \#auto_saved_files#
 
+#STM32cudebIDE
+*.o
+*.d
+*.su
+*.cyclo
+*.elf
+*.list
+*.map
+.metadata/
+LICENSE.txt
+
 # Netlist files (exported from Eeschema)
 *.net
 

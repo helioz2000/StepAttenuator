@@ -32,6 +32,7 @@ LICENSE.txt
 
 # Netlist files (exported from Eeschema)
 *.net
+.history
 
 # Autorouter files (exported from Pcbnew)
 *.dsn

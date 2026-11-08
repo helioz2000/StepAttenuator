@@ -50,15 +50,15 @@ void MX_GPIO_Init(void)
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOA, LE1_Pin|LE2_Pin|LE3_Pin|LE4_Pin
-                          |C8_Pin|C4_Pin|C2_Pin|C1_Pin
-                          |C0_5_Pin|RLY_ON_Pin|RLY_OFF_Pin|GPIO_PIN_15, GPIO_PIN_RESET);
+                          |C16_Pin|C8_Pin|C4_Pin|C2_Pin
+                          |C1_Pin|C05_Pin|RLY_OFF_Pin|RLY_ON_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : LE1_Pin LE2_Pin LE3_Pin LE4_Pin
-                           C8_Pin C4_Pin C2_Pin C1_Pin
-                           C0_5_Pin RLY_ON_Pin RLY_OFF_Pin PA15 */
+                           C16_Pin C8_Pin C4_Pin C2_Pin
+                           C1_Pin C05_Pin RLY_OFF_Pin RLY_ON_Pin */
   GPIO_InitStruct.Pin = LE1_Pin|LE2_Pin|LE3_Pin|LE4_Pin
-                          |C8_Pin|C4_Pin|C2_Pin|C1_Pin
-                          |C0_5_Pin|RLY_ON_Pin|RLY_OFF_Pin|GPIO_PIN_15;
+                          |C16_Pin|C8_Pin|C4_Pin|C2_Pin
+                          |C1_Pin|C05_Pin|RLY_OFF_Pin|RLY_ON_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -68,9 +68,19 @@ void MX_GPIO_Init(void)
                            ATT40B_IN_Pin ATT40B_OUT_Pin */
   GPIO_InitStruct.Pin = ATT40A_IN_Pin|ATT40A_OUT_Pin|ATT20_IN_Pin|ATT20_OUT_Pin
                           |ATT40B_IN_Pin|ATT40B_OUT_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI0_1_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI0_1_IRQn);
+
+  HAL_NVIC_SetPriority(EXTI2_3_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI2_3_IRQn);
+
+  HAL_NVIC_SetPriority(EXTI4_15_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI4_15_IRQn);
 
 }
 

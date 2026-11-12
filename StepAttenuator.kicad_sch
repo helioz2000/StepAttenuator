@@ -10,6 +10,8 @@
 		(rev "0.1")
 		(company "Omniphase Pty Ltd")
 		(comment 1 "Erwin Bejsta (VK3ERW)")
+		(comment 3 "sales@omniphase.com.au")
+		(comment 4 "www.omniphase.com.au")
 	)
 	(lib_symbols
 		(symbol "Connector_Generic:Conn_01x05"

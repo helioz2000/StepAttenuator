@@ -33,9 +33,11 @@
  *
  * Wiring to STM32 MCU for text output to a 3.3V to USB Converter
  * pin 19 - USART1 TX
- * pin 21 - USART1 RX
- * !! Note: if using a 5V TTL converter you will need V-Divider on pin 21 drop the voltage to 3.3V
- * !! Divider with 1K8/3K3 resistors will work
+ * pin 21 - USART1 RX (Not required, leave disconnected)
+ * !! Note: Using a 5V TTL converter/USB the RX input should be able to read the
+ * !! 3V3 signal from the MCU.
+ * !! Do not connect the convert TX signal to USART1 RX unless you fit a V-Divider to
+ * !! drop the voltage to 3.3V divider with 1K8/3K3 resistors will work
  *
  * Service Mode Operation
  * ----------------------

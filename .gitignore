@@ -30,6 +30,8 @@ fp-info-cache
 *.map
 .metadata/
 LICENSE.txt
+**/Debug/
+**/Release/
 
 # Netlist files (exported from Eeschema)
 *.net

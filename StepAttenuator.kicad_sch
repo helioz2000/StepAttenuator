@@ -6583,7 +6583,7 @@
 				)
 			)
 		)
-		(property "Value" "0.1uF"
+		(property "Value" "4.7uF"
 			(at 160.528 67.818 90)
 			(show_name no)
 			(do_not_autoplace no)

@@ -73,8 +73,10 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define VERSION_MAJOR 1
+#define VERSION_MINOR 0
 #define PE4312_TIME 1	// [ms] delay between signal changes on the pads
-#define SERVICE_SIGNAL_DEBOUNCE 200 // [ms] debounce time for Service Mode signals
+#define SERVICE_SIGNAL_DEBOUNCE 350 // [ms] debounce time for Service Mode signals
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -273,15 +275,22 @@ void attenuator_bypass_relay(int attValue){
 	if (attValue == 0) {
 		HAL_GPIO_WritePin(RLY_ON_GPIO_Port, RLY_ON_Pin, GPIO_PIN_SET);
 		HAL_GPIO_WritePin(RLY_OFF_GPIO_Port, RLY_OFF_Pin, GPIO_PIN_RESET);
+#ifdef DEBUG
+		printf("Relay ON\r\n");
+#endif
 	} else {
 		HAL_GPIO_WritePin(RLY_ON_GPIO_Port, RLY_ON_Pin, GPIO_PIN_RESET);
 		HAL_GPIO_WritePin(RLY_OFF_GPIO_Port, RLY_OFF_Pin, GPIO_PIN_SET);
+#ifdef DEBUG
+		printf("Relay OFF\r\n");
+#endif
 	}
+
 	// Time for relay to resume new position
 	HAL_Delay(200);
 	// The relay will stay in position without power
-	HAL_GPIO_WritePin(RLY_ON_GPIO_Port, RLY_ON_Pin, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(RLY_OFF_GPIO_Port, RLY_OFF_Pin, GPIO_PIN_RESET);
+  //HAL_GPIO_WritePin(RLY_ON_GPIO_Port, RLY_ON_Pin, GPIO_PIN_RESET);
+	//HAL_GPIO_WritePin(RLY_OFF_GPIO_Port, RLY_OFF_Pin, GPIO_PIN_RESET);
 }
 
 /**
@@ -468,33 +477,41 @@ int main(void)
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
+  printf("Omniphase Pty Ltd\r\nStep Attenuator V%d.%d\r\n", VERSION_MAJOR, VERSION_MINOR);
+#ifdef DEBUG
+  printf("DEBUG compile - please download release version\r\n");
+#endif
+
   // Check for service mode (ATT40A_IN and ATT40A_OUT activated [low])
   // Other inputs to select attenuator pad to test
   if (HAL_GPIO_ReadPin(ATT40A_IN_GPIO_Port, ATT40A_IN_Pin) == GPIO_PIN_RESET)
   {
+	printf( "B1 detected\r\n");
     if (HAL_GPIO_ReadPin(ATT40A_OUT_GPIO_Port, ATT40A_OUT_Pin) == GPIO_PIN_RESET)
     {
+      printf( "B2 detected\r\n");
       ServiceMode = true;
       printf("Service Mode selected - release buttons\r\n");
-	  if (HAL_GPIO_ReadPin(ATT20_IN_GPIO_Port, ATT20_IN_Pin) == GPIO_PIN_RESET)
-	  {
-      ServicePE1 = true;
-	  } else if (HAL_GPIO_ReadPin(ATT20_OUT_GPIO_Port, ATT20_OUT_Pin) == GPIO_PIN_RESET)
-	  {
-	    ServicePE2 = true;
-	  } else if (HAL_GPIO_ReadPin(ATT40B_IN_GPIO_Port, ATT40B_IN_Pin) == GPIO_PIN_RESET)
-	  {
+	    if (HAL_GPIO_ReadPin(ATT20_IN_GPIO_Port, ATT20_IN_Pin) == GPIO_PIN_RESET)
+	    {
+        ServicePE1 = true;
+	    } else if (HAL_GPIO_ReadPin(ATT20_OUT_GPIO_Port, ATT20_OUT_Pin) == GPIO_PIN_RESET)
+	    {
+	      ServicePE2 = true;
+	    } else if (HAL_GPIO_ReadPin(ATT40B_IN_GPIO_Port, ATT40B_IN_Pin) == GPIO_PIN_RESET)
+	    {
 	    ServicePE3 = true;
-	  } else if (HAL_GPIO_ReadPin(ATT40B_OUT_GPIO_Port, ATT40B_OUT_Pin) == GPIO_PIN_RESET)
-	  {
-	    ServicePE4 = true;
-	  } else {
-	  	ServicePE1 = true;	// in case 3rd button is not pressed
-	  }
-	  // Set bypass relay off
-	  attenuator_bypass_relay(100);
-	  // set all attenuator pads to 0dB
-	  attenuator_set_pads(0);
+	    } else if (HAL_GPIO_ReadPin(ATT40B_OUT_GPIO_Port, ATT40B_OUT_Pin) == GPIO_PIN_RESET)
+	    {
+	      ServicePE4 = true;
+	    } else {
+	    	printf("3rd Button not detected, using default\r\n");
+	  	  ServicePE1 = true;	// in case 3rd button is not pressed
+	    }
+	    // Set bypass relay off
+	    attenuator_bypass_relay(100);
+	    // set all attenuator pads to 0dB
+	    attenuator_set_pads(0);
     }
     // Wait for service mode trigger to be released
     while (1)
@@ -524,7 +541,11 @@ int main(void)
 		  attenuator_set();
 		  AttStateChanged = false;
 		}
+#ifdef DEBUG
+		// Don't stop the CPU in DEBUG mode
+#else
 		MCU_stop();
+#endif
 	} else
 	// Service Mode
 	{
@@ -539,7 +560,7 @@ int main(void)
 	  	else ServiceValue = 0;
 	  	ServiceModeInc = false;
 	  	print_service_mode_PE();
-	  	printf(" %d dB x 10", ServiceValue);
+	  	printf(" %d.%d dB\r\n", ServiceValue/10, ServiceValue%10);
 	  	attenuator_set_service();
 	  }
 	  if (ServiceModeDec) {
@@ -547,7 +568,7 @@ int main(void)
 	  	else ServiceValue = 315;
 	  	ServiceModeDec = false;
 	  	print_service_mode_PE();
-	  	printf(" %d dB x 10", ServiceValue);
+	  	printf(" %d.%d dB\r\n", ServiceValue/10, ServiceValue%10);
 	  	attenuator_set_service();
 	  }
 		HAL_Delay(10);

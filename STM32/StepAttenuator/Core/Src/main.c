@@ -120,8 +120,8 @@ const int ATTENUATOR_MATRIX[6][4] = {
     {  0,   0,   0,   0},  // 0dB: bypass via relay (total insertion loss of pads is 5.2dB)
     {  0,   5,  15, 130},  // 20.2dB  25.9%, 25.1%, 23.3%, 24.7% (1.3dB,1.8dB,2.8dB,14.3dB)
     {  0,  10,  30, 310},  // 40.2dB: 25.9%, 3.5%, 27.4%, 16.2% (1.3dB,2.3dB,4.3dB,32.3dB)
-    {  5,  15, 220, 310},  // 60.2dB: 33.9%, 31.4%, 34.5%, 0.2% (1.8dB,2.8dB,23.3dB,32.3dB
-    { 15, 105, 310, 310},  // 80.2dB: 47.5%, 49.7%, 2.7%, 0% (2.8dB,11.5dB,32.3dB,32.3dB)
+    {  5,  15, 180, 285},  // 60.2dB: 33.9%, 31.4%, 34.5%, 0.2% (1.8dB,2.8dB,23.3dB,32.3dB
+    { 15, 205, 310, 310},  // 80.2dB: 47.5%, 49.7%, 2.7%, 0% (2.8dB,11.5dB,32.3dB,32.3dB)
     { 20, 310, 310, 310}   // 100.2dB: 53.2%, 46.7%, 0%, 0% (3.3dB,32.3dB,32.3dB,32.3dB)
 /*	figures without pad insertion loss
     { 10,  15,  30, 145},  // 20dB  20.6%, 23.2%, 28%, 27.2%
@@ -287,10 +287,10 @@ void attenuator_bypass_relay(int attValue){
 	}
 
 	// Time for relay to resume new position
-	HAL_Delay(200);
+	HAL_Delay(10);		// specification is 3ms
 	// The relay will stay in position without power
-  //HAL_GPIO_WritePin(RLY_ON_GPIO_Port, RLY_ON_Pin, GPIO_PIN_RESET);
-	//HAL_GPIO_WritePin(RLY_OFF_GPIO_Port, RLY_OFF_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(RLY_ON_GPIO_Port, RLY_ON_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(RLY_OFF_GPIO_Port, RLY_OFF_Pin, GPIO_PIN_RESET);
 }
 
 /**
@@ -441,6 +441,9 @@ void attenuator_set(void)
 	attenuator_bypass_relay(attValue);
 	// set all attenuator pads
 	attenuator_set_pads(attValue);
+#ifdef DEBUG
+	printf("Attenuation setpoint: %d dB\r\n", attValue);
+#endif
 }
 
 /* USER CODE END 0 */
@@ -540,6 +543,9 @@ int main(void)
 		{
 		  attenuator_set();
 		  AttStateChanged = false;
+#ifdef DEBUG
+		  printf("40dB A: %d, 20dB: %d, 40dB B: %d\r\n", Att40A_state, Att20_state, Att40B_state);
+#endif
 		}
 #ifdef DEBUG
 		// Don't stop the CPU in DEBUG mode

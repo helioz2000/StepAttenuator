@@ -19,6 +19,8 @@ RF input is conencted to a Marconi 2030 Signal Generator. RF Output is conencted
 
 A set of 6 push buttons are simulating the control signals.
 
+The following tests are performed at 200MHz to overcome the RF leakage issues inherent in the board design. Increasing the frequency to 1GHz brings out the RF leakage and restricts the board to 40dB controllable attenuation.
+
 ---
 # Test Results
 
